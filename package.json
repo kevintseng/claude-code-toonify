@@ -1,11 +1,11 @@
 {
-  "name": "@ktseng/claude-code-toonify",
+  "name": "@ktseng/toonify-mcp",
   "version": "0.1.0",
-  "description": "MCP server that optimizes token usage in Claude Code CLI by converting structured data to TOON format",
+  "description": "MCP server for TOON format token optimization - works with any MCP client (Claude Code, ChatGPT, etc.)",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "claude-code-toonify": "dist/index.js"
+    "toonify-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",

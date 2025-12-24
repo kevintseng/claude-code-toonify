@@ -4,7 +4,9 @@
 
 **使用 TOON 格式優化，降低 Claude API Token 使用量達 60% 以上**
 
-一個 MCP (Model Context Protocol) 伺服器，透過將結構化資料轉換為 TOON (Token-Oriented Object Notation) 格式，自動優化 [Claude Code CLI](https://github.com/anthropics/claude-code) 的 Token 使用量。
+一個 MCP (Model Context Protocol) 伺服器，提供**按需**的 Token 優化工具，將結構化資料轉換為 TOON (Token-Oriented Object Notation) 格式。支援任何 MCP 相容的 LLM 客戶端（Claude Code、ChatGPT 等）。
+
+⚠️ **重要**：此 MCP 伺服器提供必須明確呼叫的**工具** - 不會自動攔截內容。詳見[使用方式](#-使用方式)。
 
 ## 🌟 功能特色
 
@@ -45,49 +47,57 @@ products[2]{id,name,price}:
 ### 1. 安裝套件
 
 ```bash
-npm install -g @ktseng/claude-code-toonify
+npm install -g @ktseng/toonify-mcp
 ```
 
-### 2. 設定 Claude Code
+### 2. 註冊至 Claude Code
 
-在 Claude Code 設定檔中新增 (`~/.claude/settings.json`)：
+```bash
+# 註冊 MCP 伺服器（user scope - 所有專案可用）
+claude mcp add --scope user --transport stdio toonify -- /opt/homebrew/bin/toonify-mcp
 
-```json
-{
-  "mcpServers": {
-    "toonify": {
-      "command": "claude-code-toonify"
-    }
-  }
-}
+# 專案專用註冊
+claude mcp add --scope project --transport stdio toonify -- /opt/homebrew/bin/toonify-mcp
 ```
 
 ### 3. 驗證安裝
 
 ```bash
-# 檢查 MCP 伺服器是否已註冊
+# 檢查 MCP 伺服器是否已註冊並連線
 claude mcp list
 
-# 測試優化功能
-claude mcp call toonify optimize_content '{"content": "{\"test\": \"data\"}"}'
+# 應顯示：toonify: /opt/homebrew/bin/toonify-mcp - ✓ Connected
 ```
 
 ## 📖 使用方式
 
-### 自動優化
+### Claude Code 使用者
 
-MCP 伺服器與 Claude Code 搭配使用時自動優化工具結果：
+#### 選項 A：MCP 伺服器（手動）
+- ❌ **非自動** - Claude 必須主動呼叫工具
+- ✅ **提示時有效** - "使用 toonify 優化這個資料"
+- ✅ **通用相容性** - 適用於任何 MCP 客戶端
 
-```typescript
-// 在 Claude Code 中，工具結果會自動被攔截
-// 大型 JSON 回應在傳送至 API 前會自動優化
-const fileContent = await tools.Read({ file_path: "data.json" });
-// → 若超過 50 tokens 且為結構化資料，會自動轉換為 TOON
+#### 選項 B：Claude Code Hook（自動）⭐ 推薦
+- ✅ **完全自動** - 透明攔截工具結果
+- ✅ **零開銷** - 無需手動呼叫
+- ✅ **無縫整合** - 適用於 Read、Grep 等檔案工具
+- ⚠️ **僅限 Claude Code** - 不適用於其他 MCP 客戶端
+
+**安裝方式**：
+```bash
+cd hooks/
+npm install
+npm run build
+npm run install-hook
+
+# 驗證
+claude hooks list  # 應顯示：PostToolUse
 ```
 
-### 手動優化
+詳細設定請參閱 `hooks/README.md`。
 
-直接使用 MCP 工具：
+### 手動使用 MCP 工具
 
 ```bash
 # 優化內容
@@ -240,8 +250,8 @@ openai.chat.completions.create(
 
 ```bash
 # 複製儲存庫
-git clone https://github.com/kevintseng/claude-code-toonify.git
-cd claude-code-toonify
+git clone https://github.com/kevintseng/toonify-mcp.git
+cd toonify-mcp
 
 # 安裝依賴
 npm install
@@ -305,8 +315,8 @@ MIT License - 詳見 [LICENSE](LICENSE) 檔案
 ## 🔗 連結
 
 - **NPM 套件**：即將推出
-- **GitHub**：https://github.com/kevintseng/claude-code-toonify
-- **問題回報**：https://github.com/kevintseng/claude-code-toonify/issues
+- **GitHub**：https://github.com/kevintseng/toonify-mcp
+- **問題回報**：https://github.com/kevintseng/toonify-mcp/issues
 - **MCP 文件**：https://code.claude.com/docs/mcp
 
 ---

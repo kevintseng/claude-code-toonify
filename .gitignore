@@ -41,3 +41,15 @@ yarn-error.log*
 # Metrics (local only)
 token_stats.json
 .claude/
+
+# Session handoffs (not for other developers)
+HANDOFF.md
+
+# Publishing guide (personal workflow)
+PUBLISHING.md
+
+# npm package tarballs (build artifacts)
+*.tgz
+
+# Test scripts (personal)
+test-mcp-call.sh

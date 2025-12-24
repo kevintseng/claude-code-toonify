@@ -4,7 +4,9 @@
 
 **Reduce Claude API token usage by 60%+ using TOON format optimization**
 
-An MCP (Model Context Protocol) server that transparently optimizes token usage in [Claude Code CLI](https://github.com/anthropics/claude-code) by converting structured data to TOON (Token-Oriented Object Notation) format.
+An MCP (Model Context Protocol) server that provides **on-demand** token optimization tools for converting structured data to TOON (Token-Oriented Object Notation) format. Works with any MCP-compatible LLM client (Claude Code, ChatGPT, etc.).
+
+⚠️ **Important**: This MCP server provides **tools** that must be explicitly called - it does NOT automatically intercept content. See [Usage](#-usage) for details.
 
 ## 🌟 Features
 
@@ -45,60 +47,88 @@ products[2]{id,name,price}:
 ### 1. Install the package
 
 ```bash
-npm install -g @ktseng/claude-code-toonify
+npm install -g @ktseng/toonify-mcp
 ```
 
-### 2. Configure Claude Code
+### 2. Register with Claude Code
 
-Add to your Claude Code settings (`~/.claude/settings.json`):
+```bash
+# Register the MCP server (user scope - available in all projects)
+claude mcp add --scope user --transport stdio toonify -- /opt/homebrew/bin/toonify-mcp
 
-```json
-{
-  "mcpServers": {
-    "toonify": {
-      "command": "claude-code-toonify"
-    }
-  }
-}
+# For project-specific registration
+claude mcp add --scope project --transport stdio toonify -- /opt/homebrew/bin/toonify-mcp
 ```
 
 ### 3. Verify installation
 
 ```bash
-# Check if MCP server is registered
+# Check if MCP server is registered and connected
 claude mcp list
 
-# Test optimization
-claude mcp call toonify optimize_content '{"content": "{\"test\": \"data\"}"}'
+# Should show: toonify: /opt/homebrew/bin/toonify-mcp - ✓ Connected
 ```
 
 ## 📖 Usage
 
-### Automatic Optimization
+### How It Works: Tool-Based Optimization
 
-The MCP server automatically optimizes tool results when used with Claude Code:
+This MCP server provides **two tools** that the LLM can call:
+1. `optimize_content` - Optimizes structured data to TOON format
+2. `get_stats` - Returns optimization statistics
 
-```typescript
-// In Claude Code, tool results are automatically intercepted
-// Large JSON responses get optimized before sending to API
-const fileContent = await tools.Read({ file_path: "data.json" });
-// → Automatically converted to TOON if > 50 tokens and structured
+⚠️ **Key Limitation**: The LLM must **explicitly decide** to call these tools. There is NO automatic interception of content.
+
+### Usage Patterns
+
+**Pattern 1: Explicit User Request**
+```
+User: "Optimize this JSON data for me"
+LLM: [Calls optimize_content tool] → Returns optimized TOON format
 ```
 
-### Manual Optimization
+**Pattern 2: LLM Decides to Optimize**
+```
+LLM reads large JSON → Recognizes it's large → Calls optimize_content → Uses optimized version
+```
 
-Use the MCP tools directly:
+**Pattern 3: Custom Instructions** (ChatGPT/Claude)
+```
+"Before analyzing large JSON/CSV/YAML data, always call the optimize_content tool to reduce tokens"
+```
 
+### For ChatGPT Users
+
+ChatGPT can use this MCP server, but:
+- ❌ **NOT automatic** - ChatGPT must decide to call the tool
+- ✅ **Works when prompted** - "Use toonify to optimize this data"
+- ✅ **Custom instructions** - Add to ChatGPT custom instructions to always optimize large content
+
+### For Claude Code Users
+
+#### Option A: MCP Server (Manual)
+- ❌ **NOT automatic** - Claude must decide to call the tool
+- ✅ **Works when prompted** - "Use toonify to optimize this data"
+- ✅ **Universal compatibility** - Works with any MCP client
+
+#### Option B: Claude Code Hook (Automatic) ⭐ RECOMMENDED
+- ✅ **Fully automatic** - Intercepts tool results transparently
+- ✅ **Zero overhead** - No manual calls needed
+- ✅ **Seamless integration** - Works with Read, Grep, and other file tools
+- ⚠️ **Claude Code only** - Doesn't work with other MCP clients
+
+**Installation**:
 ```bash
-# Optimize content
-claude mcp call toonify optimize_content '{
-  "content": "{\"products\": [{\"id\": 1, \"name\": \"Test\"}]}",
-  "toolName": "Read"
-}'
+cd hooks/
+npm install
+npm run build
+npm run install-hook
 
-# Get statistics
-claude mcp call toonify get_stats '{}'
+# Verify
+claude hooks list  # Should show: PostToolUse
 ```
+
+See `hooks/README.md` for detailed setup and configuration.
 
 ## 🔧 Configuration
 
@@ -240,8 +270,8 @@ openai.chat.completions.create(
 
 ```bash
 # Clone repository
-git clone https://github.com/ktseng/claude-code-toonify.git
-cd claude-code-toonify
+git clone https://github.com/ktseng/toonify-mcp.git
+cd toonify-mcp
 
 # Install dependencies
 npm install
@@ -305,8 +335,8 @@ MIT License - see [LICENSE](LICENSE) file
 ## 🔗 Links
 
 - **NPM Package**: Coming soon
-- **GitHub**: https://github.com/ktseng/claude-code-toonify
-- **Issues**: https://github.com/ktseng/claude-code-toonify/issues
+- **GitHub**: https://github.com/ktseng/toonify-mcp
+- **Issues**: https://github.com/ktseng/toonify-mcp/issues
 - **MCP Documentation**: https://code.claude.com/docs/mcp
 
 ---

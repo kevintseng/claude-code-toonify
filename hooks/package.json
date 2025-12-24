@@ -1,0 +1,23 @@
+{
+  "name": "toonify-mcp-hook",
+  "version": "0.1.0",
+  "description": "Claude Code hook for automatic TOON format optimization",
+  "type": "module",
+  "main": "post-tool-use.js",
+  "bin": {
+    "toonify-hook": "./post-tool-use.js"
+  },
+  "dependencies": {
+    "@toon-format/toon": "^2.1.0",
+    "tiktoken": "^1.0.0",
+    "yaml": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "install-hook": "npm run build && claude hooks add PostToolUse -- node $(pwd)/post-tool-use.js"
+  }
+}

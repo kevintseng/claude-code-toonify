@@ -1,0 +1,20 @@
+# Source files
+src/
+tests/
+tsconfig.json
+jest.config.js
+
+# Development files
+.git/
+.github/
+*.log
+*.md
+!README.md
+!README.zh-TW.md
+
+# Test files
+coverage/
+test-mcp.json
+
+# Build artifacts (keep dist for npm)
+node_modules/

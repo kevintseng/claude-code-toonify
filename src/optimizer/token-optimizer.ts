@@ -2,7 +2,7 @@
  * TokenOptimizer: Core optimization logic using Toonify
  */
 
-import { encode as toonEncode, decode as toonDecode } from '@scrapegraph/toonify';
+import { encode as toonEncode, decode as toonDecode } from '@toon-format/toon';
 import { encoding_for_model } from 'tiktoken';
 import yaml from 'yaml';
 import type {

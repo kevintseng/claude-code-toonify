@@ -12,6 +12,7 @@ An MCP (Model Context Protocol) server that transparently optimizes token usage 
 - **🔄 Silent Fallback**: Never breaks your workflow
 - **📊 Built-in Metrics**: Track savings locally
 - **🔌 MCP Integration**: Works seamlessly with Claude Code
+- **🌍 Universal Compatibility**: Works with ANY LLM (GPT, Claude, Gemini, etc.)
 
 ## 📊 Performance
 
@@ -138,6 +139,56 @@ Total Savings: 889,555 (61.1%)
 
 💰 Cost Savings (at $3/1M input tokens):
    $2.67 saved
+```
+
+## 🌍 Universal Compatibility
+
+### ✅ **Works with ANY LLM:**
+- OpenAI (GPT-4, GPT-3.5)
+- Anthropic (Claude 3.5, Claude Opus)
+- Google (Gemini)
+- Mistral, Llama, etc.
+
+The TOON optimization reduces tokens for **all** LLM APIs.
+
+### ✅ **Works with ANY MCP Client:**
+- **Claude Code CLI** (what we designed for)
+- **Claude Desktop App**
+- **Custom MCP clients**
+- **VSCode with MCP support**
+- **Any tool implementing MCP protocol**
+
+### 🔧 **How It Works:**
+
+**For Claude Code (automatic):**
+```bash
+# Configure once in settings.json
+claude mcp call toonify optimize_content '{"content": "..."}'
+```
+
+**For Other MCP Clients:**
+```javascript
+// Any MCP client can call the same tools
+await mcpClient.callTool("toonify", "optimize_content", {
+  content: largeJsonData,
+  toolName: "Read"
+});
+```
+
+**For Direct LLM Usage (no MCP):**
+```python
+# Use Toonify directly in your code
+from toonify import encode
+import openai
+
+data = {"products": [...]}
+optimized_data = encode(data)  # 60% token reduction
+
+# Works with any LLM
+openai.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": f"Analyze: {optimized_data}"}]
+)
 ```
 
 ## 🏗️ Architecture

@@ -1,20 +1,30 @@
-# Source files
+# Source files (compiled to dist/)
 src/
-tests/
-tsconfig.json
-jest.config.js
-
-# Development files
-.git/
-.github/
-*.log
-*.md
-!README.md
-!README.zh-TW.md
 
 # Test files
-coverage/
+test-mcp-call.sh
 test-mcp.json
+*.test.ts
+tests/
+jest.config.js
 
-# Build artifacts (keep dist for npm)
-node_modules/
+# Build artifacts
+*.tgz
+
+# Documentation (session-specific)
+HANDOFF.md
+PUBLISHING.md
+
+# Development
+.git
+.github
+.vscode
+*.swp
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+
+# Hooks directory (separate installation)
+hooks/node_modules
+hooks/package-lock.json

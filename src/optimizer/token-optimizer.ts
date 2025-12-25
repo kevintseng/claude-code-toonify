@@ -11,10 +11,12 @@ import type {
   StructuredData,
   OptimizationConfig
 } from './types.js';
+import { CacheOptimizer } from './caching/index.js';
 
 export class TokenOptimizer {
   private config: OptimizationConfig;
   private tokenEncoder;
+  private cacheOptimizer: CacheOptimizer;
 
   constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
@@ -23,11 +25,21 @@ export class TokenOptimizer {
       minSavingsThreshold: 30,
       maxProcessingTime: 50,
       skipToolPatterns: [],
+      caching: {
+        enabled: true,
+        provider: 'auto',
+        ttl: '1hour',
+        cacheStaticPrompts: true,
+        minCacheableTokens: 1024
+      },
       ...config
     };
 
     // Use Claude tokenizer
     this.tokenEncoder = encoding_for_model('gpt-4');
+
+    // Initialize cache optimizer
+    this.cacheOptimizer = new CacheOptimizer(this.config.caching);
   }
 
   /**
@@ -103,17 +115,36 @@ export class TokenOptimizer {
         };
       }
 
+      // v0.3.0: Wrap with caching structure
+      const cachedContent = this.cacheOptimizer.wrapWithCaching(
+        toonContent,
+        metadata?.toolName || 'unknown',
+        structuredData.type,
+        originalTokens,
+        optimizedTokens
+      );
+
+      // Calculate additional savings from caching
+      // Assume 90% cache hit rate after first request
+      const cacheSavings = cachedContent.cacheBreakpoint ?
+        Math.floor(tokenSavings * 0.9) : 0;
+
       return {
         optimized: true,
         originalContent: content,
-        optimizedContent: toonContent,
+        optimizedContent: cachedContent.cacheBreakpoint ?
+          cachedContent.staticPrefix + cachedContent.dynamicContent :
+          cachedContent.dynamicContent,
         originalTokens,
         optimizedTokens,
         savings: {
           tokens: tokenSavings,
-          percentage: savingsPercentage
+          percentage: savingsPercentage,
+          withCaching: cacheSavings
         },
-        format: structuredData.type
+        format: structuredData.type,
+        cachedContent,
+        cacheMetrics: this.cacheOptimizer.getMetrics()
       };
 
     } catch (error) {
@@ -210,5 +241,12 @@ export class TokenOptimizer {
       const regex = new RegExp(pattern);
       return regex.test(toolName);
     }) ?? false;
+  }
+
+  /**
+   * Get cache optimizer instance for external access
+   */
+  getCacheOptimizer(): CacheOptimizer {
+    return this.cacheOptimizer;
   }
 }

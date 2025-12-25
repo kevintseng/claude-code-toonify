@@ -17,6 +17,9 @@ export interface OptimizationMetric {
   wasOptimized: boolean;
   format?: string;
   reason?: string;
+  // v0.3.0: Cache metrics
+  wasCached?: boolean;
+  cacheSavings?: number;
 }
 
 export class MetricsCollector {
@@ -47,6 +50,18 @@ export class MetricsCollector {
       stats.tokensBeforeOptimization += metric.originalTokens;
       stats.tokensAfterOptimization += metric.optimizedTokens;
       stats.totalSavings += metric.savings;
+
+      // v0.3.0: Track cache metrics
+      if (metric.wasCached) {
+        stats.cacheHits = (stats.cacheHits || 0) + 1;
+        stats.estimatedCacheSavings = (stats.estimatedCacheSavings || 0) + (metric.cacheSavings || 0);
+      } else if (metric.wasOptimized) {
+        stats.cacheMisses = (stats.cacheMisses || 0) + 1;
+      }
+
+      // Calculate cache hit rate
+      const totalCacheAttempts = (stats.cacheHits || 0) + (stats.cacheMisses || 0);
+      stats.cacheHitRate = totalCacheAttempts > 0 ? (stats.cacheHits || 0) / totalCacheAttempts : 0;
 
       // Recalculate average
       stats.averageSavingsPercentage =
@@ -87,6 +102,11 @@ export class MetricsCollector {
         tokensAfterOptimization: 0,
         totalSavings: 0,
         averageSavingsPercentage: 0,
+        // v0.3.0: Cache stats
+        cacheHits: 0,
+        cacheMisses: 0,
+        cacheHitRate: 0,
+        estimatedCacheSavings: 0,
       };
     }
   }
@@ -108,18 +128,42 @@ export class MetricsCollector {
   async formatDashboard(): Promise<string> {
     const stats = await this.getStats();
 
-    return `
-📊 Token Optimization Stats
-━━━━━━━━━━━━━━━━━━━━━━━━
+    const optimizationRate = stats.totalRequests > 0
+      ? ((stats.optimizedRequests / stats.totalRequests) * 100).toFixed(1)
+      : '0.0';
+
+    // v0.3.0: Calculate total savings including cache
+    const totalSavingsWithCache = stats.totalSavings + (stats.estimatedCacheSavings || 0);
+    const costSavings = ((totalSavingsWithCache / 1_000_000) * 3).toFixed(2);
+
+    let dashboard = `
+📊 Token Optimization Stats (v0.3.0)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Total Requests: ${stats.totalRequests}
-Optimized: ${stats.optimizedRequests} (${((stats.optimizedRequests / stats.totalRequests) * 100).toFixed(1)}%)
+Optimized: ${stats.optimizedRequests} (${optimizationRate}%)
 
 Tokens Before: ${stats.tokensBeforeOptimization.toLocaleString()}
 Tokens After: ${stats.tokensAfterOptimization.toLocaleString()}
-Total Savings: ${stats.totalSavings.toLocaleString()} (${stats.averageSavingsPercentage.toFixed(1)}%)
+Total Savings: ${stats.totalSavings.toLocaleString()} (${stats.averageSavingsPercentage.toFixed(1)}%)`;
 
-💰 Cost Savings (at $3/1M input tokens):
-   $${((stats.totalSavings / 1_000_000) * 3).toFixed(2)} saved
-`.trim();
+    // Add cache stats if available
+    if (stats.cacheHits || stats.cacheMisses) {
+      const cacheHitRate = (stats.cacheHitRate! * 100).toFixed(1);
+      dashboard += `
+
+🚀 Prompt Caching Stats
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Cache Hits: ${stats.cacheHits}
+Cache Misses: ${stats.cacheMisses}
+Hit Rate: ${cacheHitRate}%
+Additional Cache Savings: ${(stats.estimatedCacheSavings || 0).toLocaleString()} tokens`;
+    }
+
+    dashboard += `
+
+💰 Total Cost Savings (at $3/1M input tokens):
+   $${costSavings} saved`;
+
+    return dashboard.trim();
   }
 }

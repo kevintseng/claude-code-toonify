@@ -14,7 +14,11 @@ interface Result {
 }
 
 describe('Token Savings Stats', () => {
-  const optimizer = new TokenOptimizer();
+  // Use lower threshold for benchmark tests to show all achievable savings
+  const optimizer = new TokenOptimizer({
+    minSavingsThreshold: 0, // Show all savings, even small ones
+    minTokensThreshold: 10  // Very low threshold for small test cases
+  });
   const results: Result[] = [];
 
   async function bench(name: string, cat: string, data: any): Promise<Result> {

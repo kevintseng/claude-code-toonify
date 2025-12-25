@@ -201,7 +201,7 @@ describe('LRUCache', () => {
   });
 
   describe('Persistence', () => {
-    it('should save and load from disk', () => {
+    it('should save and load from disk', async () => {
       const persistentCache = new LRUCache<string>({
         enabled: true,
         maxSize: 10,
@@ -212,7 +212,7 @@ describe('LRUCache', () => {
 
       persistentCache.set('key1', 'value1');
       persistentCache.set('key2', 'value2');
-      persistentCache.saveToDisk();
+      await persistentCache.saveToDisk();
 
       // Create new cache instance with same path
       const loadedCache = new LRUCache<string>({

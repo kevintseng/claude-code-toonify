@@ -106,13 +106,13 @@ Jane Smith,25,London,UK`;
   });
 
   describe('Content size threshold', () => {
-    test('skips optimization for small content (< 200 chars)', async () => {
+    test('skips optimization for non-structured content', async () => {
       const smallContent = 'This is a short text';
 
       const result = await optimizer.optimize(smallContent);
 
       expect(result.optimized).toBe(false);
-      expect(result.reason).toBe('Content too small');
+      expect(result.reason).toBe('Not structured data');
       expect(result.originalTokens).toBeDefined();
     });
 
@@ -317,14 +317,14 @@ users:
       const result = await optimizer.optimize('');
 
       expect(result.optimized).toBe(false);
-      expect(result.reason).toBe('Content too small');
+      expect(result.reason).toBe('Not structured data');
     });
 
     test('handles whitespace-only content', async () => {
       const result = await optimizer.optimize('   \n\t  \n   ');
 
       expect(result.optimized).toBe(false);
-      expect(result.reason).toBe('Content too small');
+      expect(result.reason).toBe('Not structured data');
     });
 
     test('handles exactly 200 characters threshold', async () => {

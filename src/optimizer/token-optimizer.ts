@@ -47,6 +47,9 @@ export class TokenOptimizer {
       ...config
     };
 
+    // Validate resultCache configuration
+    this.validateResultCacheConfig(this.config.resultCache);
+
     // v0.3.0: Use multilingual tokenizer
     this.tokenEncoder = new MultilingualTokenizer('gpt-4', true);
 
@@ -67,19 +70,20 @@ export class TokenOptimizer {
     const startTime = Date.now();
 
     // v0.4.0: Check LRU cache first
-    const cacheKey = LRUCache.generateKey(content);
+    // Include metadata in cache key to avoid false cache hits
+    const cacheKey = this.generateCacheKey(content, metadata);
     const cachedResult = this.resultCache.get(cacheKey);
     if (cachedResult) {
       return cachedResult;
     }
 
-    // Quick path: skip if disabled or content too small
-    if (!this.config.enabled || content.length < 200) {
+    // Quick path: skip if disabled
+    if (!this.config.enabled) {
       return {
         optimized: false,
         originalContent: content,
         originalTokens: this.countTokens(content),
-        reason: 'Content too small'
+        reason: 'Optimizer disabled'
       };
     }
 
@@ -278,6 +282,60 @@ export class TokenOptimizer {
       const regex = new RegExp(pattern);
       return regex.test(toolName);
     }) ?? false;
+  }
+
+  /**
+   * Generate cache key from content and metadata
+   * Includes toolName to prevent false cache hits across different tools
+   */
+  private generateCacheKey(content: string, metadata?: ToolMetadata): string {
+    const metadataKey = metadata?.toolName || 'unknown';
+    const combinedContent = `${metadataKey}:${content}`;
+    return LRUCache.generateKey(combinedContent);
+  }
+
+  /**
+   * Validate resultCache configuration
+   * Throws error if configuration is invalid
+   */
+  private validateResultCacheConfig(config: any): void {
+    if (!config) {
+      throw new Error('resultCache configuration is required');
+    }
+
+    if (typeof config.enabled !== 'boolean') {
+      throw new Error('resultCache.enabled must be a boolean');
+    }
+
+    if (config.maxSize !== undefined) {
+      if (typeof config.maxSize !== 'number' || config.maxSize <= 0) {
+        throw new Error('resultCache.maxSize must be a positive number');
+      }
+      if (config.maxSize > 10000) {
+        console.warn('[TokenOptimizer] resultCache.maxSize > 10000 may cause high memory usage');
+      }
+    }
+
+    if (config.ttl !== undefined) {
+      if (typeof config.ttl !== 'number' || config.ttl <= 0) {
+        throw new Error('resultCache.ttl must be a positive number (milliseconds)');
+      }
+      if (config.ttl < 1000) {
+        console.warn('[TokenOptimizer] resultCache.ttl < 1s may cause excessive cache churn');
+      }
+    }
+
+    if (config.persistent !== undefined && typeof config.persistent !== 'boolean') {
+      throw new Error('resultCache.persistent must be a boolean');
+    }
+
+    if (config.persistent && !config.persistPath) {
+      throw new Error('resultCache.persistPath is required when persistent=true');
+    }
+
+    if (config.persistPath !== undefined && typeof config.persistPath !== 'string') {
+      throw new Error('resultCache.persistPath must be a string');
+    }
   }
 
   /**

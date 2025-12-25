@@ -15,6 +15,7 @@ export class LRUCache<T = any> {
   private config: Required<LRUCacheConfig>;
   private stats: LRUCacheStats;
   private persistentCache?: PersistentCache<T>;
+  private totalAccessCount: number = 0; // Running total for O(1) average calculation
 
   constructor(config: Partial<LRUCacheConfig> = {}) {
     this.config = {
@@ -70,6 +71,7 @@ export class LRUCache<T = any> {
 
     // Check if expired
     if (this.isExpired(entry)) {
+      this.totalAccessCount -= entry.accessCount; // Update running total
       this.cache.delete(key);
       this.stats.expirations++;
       this.stats.misses++;
@@ -80,6 +82,7 @@ export class LRUCache<T = any> {
     // Update access metadata (LRU)
     entry.lastAccessed = Date.now();
     entry.accessCount++;
+    this.totalAccessCount++; // Update running total
 
     // Delete and re-insert to move to end (most recently used in Map)
     this.cache.delete(key);
@@ -140,6 +143,11 @@ export class LRUCache<T = any> {
     const firstKey = this.cache.keys().next().value;
 
     if (firstKey) {
+      const entry = this.cache.get(firstKey);
+      if (entry) {
+        this.totalAccessCount -= entry.accessCount; // Update running total
+      }
+
       this.cache.delete(firstKey);
       this.stats.evictions++;
       this.stats.currentSize = this.cache.size;
@@ -157,6 +165,7 @@ export class LRUCache<T = any> {
   clear(): void {
     this.cache.clear();
     this.stats.currentSize = 0;
+    this.totalAccessCount = 0; // Reset running total
 
     if (this.persistentCache) {
       this.persistentCache.clear();
@@ -172,6 +181,7 @@ export class LRUCache<T = any> {
 
     for (const [key, entry] of this.cache.entries()) {
       if (now > entry.expiresAt) {
+        this.totalAccessCount -= entry.accessCount; // Update running total
         this.cache.delete(key);
         this.stats.expirations++;
         removed++;
@@ -194,18 +204,14 @@ export class LRUCache<T = any> {
   }
 
   /**
-   * Update hit rate and average access count
+   * Update hit rate and average access count (O(1) complexity)
    */
   private updateStats(): void {
     const total = this.stats.hits + this.stats.misses;
     this.stats.hitRate = total > 0 ? this.stats.hits / total : 0;
 
-    // Calculate average access count
-    let totalAccess = 0;
-    for (const entry of this.cache.values()) {
-      totalAccess += entry.accessCount;
-    }
-    this.stats.averageAccessCount = this.cache.size > 0 ? totalAccess / this.cache.size : 0;
+    // Calculate average access count using running total (O(1))
+    this.stats.averageAccessCount = this.cache.size > 0 ? this.totalAccessCount / this.cache.size : 0;
   }
 
   /**
@@ -227,20 +233,24 @@ export class LRUCache<T = any> {
       }
 
       this.cache.set(entry.key, entry);
+      this.totalAccessCount += entry.accessCount; // Initialize running total from disk
     }
 
     this.stats.currentSize = this.cache.size;
   }
 
   /**
-   * Force save all entries to disk
+   * Force save all entries to disk and wait for completion
    */
-  saveToDisk(): void {
+  async saveToDisk(): Promise<void> {
     if (!this.persistentCache) {
       return;
     }
 
-    this.persistentCache.saveAll(Array.from(this.cache.values()));
+    // Flush all pending writes and save current state
+    await this.persistentCache.flush();
+    await this.persistentCache.saveAll(Array.from(this.cache.values()));
+    await this.persistentCache.flush(); // Ensure final save completes
   }
 
   /**

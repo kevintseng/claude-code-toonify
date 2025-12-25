@@ -96,97 +96,125 @@ export class ToonifyMCPServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
-      switch (name) {
-        case 'optimize_content': {
-          const { content, toolName } = args as {
-            content: string;
-            toolName?: string;
-          };
+      try {
+        switch (name) {
+          case 'optimize_content': {
+            const { content, toolName } = args as {
+              content: string;
+              toolName?: string;
+            };
 
-          const result = await this.optimizer.optimize(content, {
-            toolName: toolName || 'unknown',
-            size: content.length,
-          });
+            // Validate input
+            if (!content || typeof content !== 'string') {
+              return this.formatErrorResponse('INVALID_INPUT', 'content must be a non-empty string');
+            }
 
-          // Record metrics
-          await this.metrics.record({
-            timestamp: new Date().toISOString(),
-            toolName: toolName || 'unknown',
-            originalTokens: result.originalTokens,
-            optimizedTokens: result.optimizedTokens || result.originalTokens,
-            savings: result.savings?.tokens || 0,
-            savingsPercentage: result.savings?.percentage || 0,
-            wasOptimized: result.optimized,
-            format: result.format,
-            reason: result.reason,
-          });
+            const result = await this.optimizer.optimize(content, {
+              toolName: toolName || 'unknown',
+              size: content.length,
+            });
 
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
+            // Record metrics
+            await this.metrics.record({
+              timestamp: new Date().toISOString(),
+              toolName: toolName || 'unknown',
+              originalTokens: result.originalTokens,
+              optimizedTokens: result.optimizedTokens || result.originalTokens,
+              savings: result.savings?.tokens || 0,
+              savingsPercentage: result.savings?.percentage || 0,
+              wasOptimized: result.optimized,
+              format: result.format,
+              reason: result.reason,
+            });
+
+            return this.formatSuccessResponse(result, 'Content optimization completed');
+          }
+
+          case 'get_stats': {
+            const stats = await this.metrics.getStats();
+            return this.formatSuccessResponse(stats, 'Statistics retrieved successfully');
+          }
+
+          case 'clear_cache': {
+            this.optimizer.clearResultCache();
+            return this.formatSuccessResponse(
+              { cleared: true },
+              'Cache cleared successfully'
+            );
+          }
+
+          case 'get_cache_stats': {
+            const cacheStats = this.optimizer.getCacheStats();
+            return this.formatSuccessResponse(cacheStats, 'Cache statistics retrieved successfully');
+          }
+
+          case 'cleanup_expired_cache': {
+            const removedCount = this.optimizer.cleanupExpiredCache();
+            return this.formatSuccessResponse(
+              { removedEntries: removedCount },
+              `Cleaned up ${removedCount} expired cache entries`
+            );
+          }
+
+          default:
+            return this.formatErrorResponse('UNKNOWN_TOOL', `Unknown tool: ${name}`);
         }
+      } catch (error) {
+        // Catch any unhandled errors
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        const errorCode = error instanceof Error && error.name ? error.name : 'INTERNAL_ERROR';
 
-        case 'get_stats': {
-          const stats = await this.metrics.getStats();
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(stats, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'clear_cache': {
-          this.optimizer.clearResultCache();
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify({ success: true, message: 'Cache cleared successfully' }, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'get_cache_stats': {
-          const cacheStats = this.optimizer.getCacheStats();
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(cacheStats, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'cleanup_expired_cache': {
-          const removedCount = this.optimizer.cleanupExpiredCache();
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify({
-                  success: true,
-                  removedEntries: removedCount,
-                  message: `Cleaned up ${removedCount} expired cache entries`
-                }, null, 2),
-              },
-            ],
-          };
-        }
-
-        default:
-          throw new Error(`Unknown tool: ${name}`);
+        console.error(`[ToonifyMCPServer] Error in tool ${name}:`, error);
+        return this.formatErrorResponse(errorCode, errorMessage);
       }
     });
+  }
+
+  /**
+   * Format successful response in standardized format
+   */
+  private formatSuccessResponse(data: any, message?: string) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(
+            {
+              success: true,
+              data,
+              message,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+
+  /**
+   * Format error response in standardized format
+   */
+  private formatErrorResponse(code: string, message: string) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(
+            {
+              success: false,
+              error: {
+                code,
+                message,
+              },
+            },
+            null,
+            2
+          ),
+        },
+      ],
+      isError: true,
+    };
   }
 
   async start() {

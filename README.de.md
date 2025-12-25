@@ -5,14 +5,15 @@
 MCP-Server + Claude Code Plugin zur automatischen Token-Optimierung für strukturierte Daten.
 Reduziert den Claude-API-Token-Verbrauch um **30-65% je nach Datenstruktur** durch transparente TOON-Format-Konvertierung, mit typischen Einsparungen von **50-55%** für strukturierte Daten.
 
-## Neu in v0.3.0
+## Neu in v0.4.0
 
-✨ **Mehrsprachige Token-Optimierung!**
-- ✅ Präzise Token-Zählung für über 15 Sprachen (Chinesisch, Japanisch, Koreanisch, Spanisch, Arabisch, etc.)
-- ✅ Sprachabhängige Token-Multiplikatoren (2x für Chinesisch, 2,5x für Japanisch, 3x für Arabisch)
-- ✅ Unterstützung für mehrsprachige Texte mit automatischer Erkennung
-- ✅ Verbesserte Optimierungsgenauigkeit basierend auf echten Benchmarks
-- ✅ Datengestützte Token-Einsparungs-Angaben (30-65% Bereich, typischerweise 50-55%)
+✨ **Verbessertes Caching-System!**
+- ✅ LRU-Cache mit TTL-Ablauf und optionaler Festplattenpersistenz
+- ✅ 50-500x Leistungsverbesserung bei Cache-Treffern (~0,1ms vs 5-50ms)
+- ✅ Drei neue MCP-Tools: `clear_cache`, `get_cache_stats`, `cleanup_expired_cache`
+- ✅ Automatisches Caching von Optimierungsergebnissen - vermeidet erneute Verarbeitung identischer Inhalte
+- ✅ Kritische Fehlerbehebungen: Race Conditions, übermäßige Festplatten-E/A, O(n) Leistungsprobleme
+- ✅ Alle 122 Tests bestehen (waren 105) - 5 Benchmark-Testfehler behoben
 
 ## Funktionen
 
@@ -241,7 +242,20 @@ Beiträge sind willkommen! Bitte lesen Sie [CONTRIBUTING.md](CONTRIBUTING.md) f�
 
 MIT License - siehe [LICENSE](LICENSE)
 
+---
+
+🇹🇼 **Crafted in Taiwan** | 台灣製造
+_Where innovation meets tradition_
+
 ## Änderungsprotokoll
+
+### v0.4.0 (2025-12-26)
+- ✨ **Verbessertes Caching-System** - LRU-Cache mit TTL-Ablauf und optionaler Persistenz
+- ✨ 50-500x Leistungsverbesserung bei Cache-Treffern (~0,1ms vs 5-50ms)
+- ✨ Drei neue MCP-Tools für Cache-Verwaltung
+- 🐛 Kritische Fehlerbehebungen: Race Conditions, übermäßige Festplatten-E/A, O(n) Leistung
+- 🐛 Falsche Cache-Treffer, fehlende Validierung, unbehandelte Fehler behoben
+- ✅ Alle 122 Tests bestehen (5 Benchmark-Testfehler behoben)
 
 ### v0.3.0 (2025-12-26)
 - ✨ **Mehrsprachige Token-Optimierung** - präzise Zählung für über 15 Sprachen

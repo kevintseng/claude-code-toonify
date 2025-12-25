@@ -5,14 +5,15 @@
 Serveur MCP + Plugin Claude Code offrant une optimisation automatique des tokens pour les données structurées.
 Réduit l'utilisation des tokens de l'API Claude de **30 à 65 % selon la structure des données** grâce à la conversion transparente au format TOON, avec des économies typiques de **50 à 55 %** pour les données structurées.
 
-## Nouveautés de la version 0.3.0
+## Nouveautés de la v0.4.0
 
-✨ **Optimisation multilingue des tokens !**
-- ✅ Comptage précis des tokens pour plus de 15 langues (chinois, japonais, coréen, espagnol, arabe, etc.)
-- ✅ Multiplicateurs de tokens adaptés aux langues (2x pour le chinois, 2,5x pour le japonais, 3x pour l'arabe)
-- ✅ Support des textes multilingues avec détection automatique
-- ✅ Précision d'optimisation améliorée basée sur des benchmarks réels
-- ✅ Revendications d'économies de tokens basées sur des données (plage de 30 à 65 %, typiquement 50 à 55 %)
+✨ **Système de cache amélioré !**
+- ✅ Cache LRU avec expiration TTL et persistance disque optionnelle
+- ✅ Amélioration des performances de 50 à 500x sur les résultats en cache (~0,1ms vs 5-50ms)
+- ✅ Trois nouveaux outils MCP : `clear_cache`, `get_cache_stats`, `cleanup_expired_cache`
+- ✅ Cache automatique des résultats d'optimisation - évite le retraitement du contenu identique
+- ✅ Corrections de bugs critiques : conditions de course, E/S disque excessives, problèmes de performances O(n)
+- ✅ Tous les 122 tests réussissent (étaient 105) - corrigé 5 échecs de tests de référence
 
 ## Fonctionnalités
 
@@ -241,7 +242,20 @@ Les contributions sont les bienvenues ! Veuillez consulter [CONTRIBUTING.md](CON
 
 Licence MIT - voir [LICENSE](LICENSE)
 
+---
+
+🇹🇼 **Crafted in Taiwan** | 台灣製造
+_Where innovation meets tradition_
+
 ## Journal des modifications
+
+### v0.4.0 (2025-12-26)
+- ✨ **Système de cache amélioré** - Cache LRU avec expiration TTL et persistance optionnelle
+- ✨ Amélioration des performances de 50 à 500x sur les résultats en cache (~0,1ms vs 5-50ms)
+- ✨ Trois nouveaux outils MCP pour la gestion du cache
+- 🐛 Corrections de bugs critiques : conditions de course, E/S disque excessives, performances O(n)
+- 🐛 Correction des faux positifs de cache, validation manquante, erreurs non gérées
+- ✅ Tous les 122 tests réussissent (corrigé 5 échecs de tests de référence)
 
 ### v0.3.0 (2025-12-26)
 - ✨ **Optimisation multilingue des tokens** - comptage précis pour plus de 15 langues

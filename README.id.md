@@ -5,14 +5,15 @@
 Server MCP + Plugin Claude Code yang menyediakan optimasi token otomatis untuk data terstruktur.
 Mengurangi penggunaan token Claude API sebesar **30-65% tergantung struktur data** melalui konversi format TOON yang transparan, dengan penghematan tipikal **50-55%** untuk data terstruktur.
 
-## Fitur Baru di v0.3.0
+## Fitur Baru di v0.4.0
 
-✨ **Optimasi Token Multibahasa!**
-- ✅ Penghitungan token yang akurat untuk 15+ bahasa (Mandarin, Jepang, Korea, Spanyol, Arab, dll.)
-- ✅ Pengali token sadar bahasa (2x untuk Mandarin, 2.5x untuk Jepang, 3x untuk Arab)
-- ✅ Dukungan deteksi otomatis teks campuran multibahasa
-- ✅ Peningkatan akurasi optimasi berdasarkan tes benchmark nyata
-- ✅ Klaim penghematan token yang didukung data (rentang 30-65%, biasanya 50-55%)
+✨ **Sistem Caching yang Ditingkatkan!**
+- ✅ Cache LRU dengan kedaluwarsa TTL dan persistensi disk opsional
+- ✅ Peningkatan kinerja 50-500x pada cache hit (~0,1ms vs 5-50ms)
+- ✅ Tiga tool MCP baru: `clear_cache`, `get_cache_stats`, `cleanup_expired_cache`
+- ✅ Caching hasil optimasi otomatis - menghindari pemrosesan ulang konten identik
+- ✅ Perbaikan bug kritis: kondisi race, I/O disk berlebihan, masalah kinerja O(n)
+- ✅ Semua 122 tes lulus (sebelumnya 105) - memperbaiki 5 kegagalan tes benchmark
 
 ## Fitur
 
@@ -241,7 +242,20 @@ Kontribusi sangat disambut! Silakan lihat [CONTRIBUTING.md](CONTRIBUTING.md) unt
 
 Lisensi MIT - lihat [LICENSE](LICENSE)
 
+---
+
+🇹🇼 **Crafted in Taiwan** | 台灣製造
+_Where innovation meets tradition_
+
 ## Catatan Perubahan
+
+### v0.4.0 (2025-12-26)
+- ✨ **Sistem caching yang ditingkatkan** - Cache LRU dengan kedaluwarsa TTL dan persistensi opsional
+- ✨ Peningkatan kinerja 50-500x pada cache hit (~0,1ms vs 5-50ms)
+- ✨ Tiga tool MCP baru untuk manajemen cache
+- 🐛 Perbaikan bug kritis: kondisi race, I/O disk berlebihan, kinerja O(n)
+- 🐛 Memperbaiki cache hit palsu, validasi yang hilang, error yang tidak ditangani
+- ✅ Semua 122 tes lulus (memperbaiki 5 kegagalan tes benchmark)
 
 ### v0.3.0 (2025-12-26)
 - ✨ **Optimasi token multibahasa** - penghitungan akurat untuk 15+ bahasa

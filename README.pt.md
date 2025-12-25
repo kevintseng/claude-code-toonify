@@ -5,14 +5,15 @@
 Servidor MCP + Plugin Claude Code fornecendo otimização automática de tokens para dados estruturados.
 Reduz o uso de tokens da API do Claude em **30-65% dependendo da estrutura de dados** através da conversão transparente para o formato TOON, com economias típicas de **50-55%** para dados estruturados.
 
-## Novidades na v0.3.0
+## Novidades na v0.4.0
 
-✨ **Otimização Multilíngue de Tokens!**
-- ✅ Contagem precisa de tokens para mais de 15 idiomas (chinês, japonês, coreano, espanhol, árabe, etc.)
-- ✅ Multiplicadores de tokens conscientes do idioma (2x para chinês, 2.5x para japonês, 3x para árabe)
-- ✅ Suporte a textos em idiomas mistos com detecção automática
-- ✅ Precisão de otimização aprimorada baseada em benchmarks reais
-- ✅ Economia de tokens comprovada por dados (faixa de 30-65%, tipicamente 50-55%)
+✨ **Sistema de cache aprimorado!**
+- ✅ Cache LRU com expiração TTL e persistência em disco opcional
+- ✅ Melhoria de desempenho de 50-500x em acertos de cache (~0,1ms vs 5-50ms)
+- ✅ Três novas ferramentas MCP: `clear_cache`, `get_cache_stats`, `cleanup_expired_cache`
+- ✅ Cache automático de resultados de otimização - evita reprocessamento de conteúdo idêntico
+- ✅ Correções críticas de bugs: condições de corrida, E/S de disco excessiva, problemas de desempenho O(n)
+- ✅ Todos os 122 testes passaram (eram 105) - corrigidos 5 falhas de testes de benchmark
 
 ## Recursos
 
@@ -241,7 +242,20 @@ Contribuições são bem-vindas! Por favor, consulte [CONTRIBUTING.md](CONTRIBUT
 
 Licença MIT - veja [LICENSE](LICENSE)
 
+---
+
+🇹🇼 **Crafted in Taiwan** | 台灣製造
+_Where innovation meets tradition_
+
 ## Changelog
+
+### v0.4.0 (2025-12-26)
+- ✨ **Sistema de cache aprimorado** - Cache LRU com expiração TTL e persistência opcional
+- ✨ Melhoria de desempenho de 50-500x em acertos de cache (~0,1ms vs 5-50ms)
+- ✨ Três novas ferramentas MCP para gerenciamento de cache
+- 🐛 Correções críticas de bugs: condições de corrida, E/S de disco excessiva, desempenho O(n)
+- 🐛 Corrigidos acertos de cache falsos, validação ausente, erros não tratados
+- ✅ Todos os 122 testes passaram (corrigidos 5 falhas de testes de benchmark)
 
 ### v0.3.0 (2025-12-26)
 - ✨ **Otimização multilíngue de tokens** - contagem precisa para mais de 15 idiomas

@@ -5,14 +5,15 @@
 Máy chủ MCP + Plugin Claude Code cung cấp tối ưu hóa token tự động cho dữ liệu có cấu trúc.
 Giảm 30-65% việc sử dụng token của Claude API **tùy thuộc vào cấu trúc dữ liệu** thông qua chuyển đổi định dạng TOON minh bạch, với mức tiết kiệm điển hình **50-55%** cho dữ liệu có cấu trúc.
 
-## Tính năng mới trong v0.3.0
+## Có gì mới trong v0.4.0
 
-✨ **Tối ưu hóa token đa ngôn ngữ!**
-- ✅ Đếm token chính xác cho hơn 15 ngôn ngữ (Trung, Nhật, Hàn, Tây Ban Nha, Ả Rập, v.v.)
-- ✅ Hệ số nhân token nhận biết ngôn ngữ (2x cho tiếng Trung, 2.5x cho tiếng Nhật, 3x cho tiếng Ả Rập)
-- ✅ Hỗ trợ phát hiện tự động văn bản hỗn hợp nhiều ngôn ngữ
-- ✅ Cải thiện độ chính xác tối ưu hóa dựa trên kiểm tra chuẩn thực tế
-- ✅ Tuyên bố tiết kiệm token được hỗ trợ bởi dữ liệu (phạm vi 30-65%, thường 50-55%)
+✨ **Hệ thống bộ nhớ cache cải tiến!**
+- ✅ Bộ nhớ cache LRU với hết hạn TTL và lưu trữ đĩa tùy chọn
+- ✅ Cải thiện hiệu suất 50-500 lần khi trúng cache (~0,1ms so với 5-50ms)
+- ✅ Ba công cụ MCP mới: `clear_cache`, `get_cache_stats`, `cleanup_expired_cache`
+- ✅ Tự động lưu cache kết quả tối ưu hóa - tránh xử lý lại nội dung giống hệt
+- ✅ Sửa lỗi nghiêm trọng: điều kiện tranh chấp, I/O đĩa quá mức, vấn đề hiệu suất O(n)
+- ✅ Tất cả 122 bài kiểm tra đã qua (trước đây là 105) - đã sửa 5 lỗi kiểm tra hiệu suất
 
 ## Tính năng
 
@@ -241,7 +242,20 @@ npm uninstall -g toonify-mcp
 
 Giấy phép MIT - xem [LICENSE](LICENSE)
 
+---
+
+🇹🇼 **Crafted in Taiwan** | 台灣製造
+_Where innovation meets tradition_
+
 ## Nhật ký thay đổi
+
+### v0.4.0 (2025-12-26)
+- ✨ **Hệ thống cache cải tiến** - Cache LRU với hết hạn TTL và lưu trữ tùy chọn
+- ✨ Cải thiện hiệu suất 50-500 lần khi trúng cache (~0,1ms so với 5-50ms)
+- ✨ Ba công cụ MCP mới cho quản lý cache
+- 🐛 Sửa lỗi nghiêm trọng: điều kiện tranh chấp, I/O đĩa quá mức, hiệu suất O(n)
+- 🐛 Sửa lỗi trúng cache sai, thiếu xác thực, lỗi chưa xử lý
+- ✅ Tất cả 122 bài kiểm tra đã qua (đã sửa 5 lỗi kiểm tra hiệu suất)
 
 ### v0.3.0 (2025-12-26)
 - ✨ **Tối ưu hóa token đa ngôn ngữ** - đếm chính xác cho hơn 15 ngôn ngữ

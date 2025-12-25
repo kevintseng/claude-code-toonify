@@ -3,7 +3,6 @@
  */
 
 import { encode as toonEncode, decode as toonDecode } from '@toon-format/toon';
-import { encoding_for_model } from 'tiktoken';
 import yaml from 'yaml';
 import type {
   OptimizationResult,
@@ -12,10 +11,11 @@ import type {
   OptimizationConfig
 } from './types.js';
 import { CacheOptimizer } from './caching/index.js';
+import { MultilingualTokenizer } from './multilingual/index.js';
 
 export class TokenOptimizer {
   private config: OptimizationConfig;
-  private tokenEncoder;
+  private tokenEncoder: MultilingualTokenizer;
   private cacheOptimizer: CacheOptimizer;
 
   constructor(config: Partial<OptimizationConfig> = {}) {
@@ -32,11 +32,15 @@ export class TokenOptimizer {
         cacheStaticPrompts: true,
         minCacheableTokens: 1024
       },
+      multilingual: {
+        enabled: true,
+        defaultLanguage: 'en'
+      },
       ...config
     };
 
-    // Use Claude tokenizer
-    this.tokenEncoder = encoding_for_model('gpt-4');
+    // v0.3.0: Use multilingual tokenizer
+    this.tokenEncoder = new MultilingualTokenizer('gpt-4', true);
 
     // Initialize cache optimizer
     this.cacheOptimizer = new CacheOptimizer(this.config.caching);
@@ -227,10 +231,20 @@ export class TokenOptimizer {
   }
 
   /**
-   * Count tokens in text
+   * Count tokens in text with language awareness
    */
   private countTokens(text: string): number {
-    return this.tokenEncoder.encode(text).length;
+    if (!this.config.multilingual?.enabled) {
+      return this.tokenEncoder.countBase(text);
+    }
+    return this.tokenEncoder.count(text);
+  }
+
+  /**
+   * Get detailed token estimate with language info
+   */
+  private getTokenEstimate(text: string) {
+    return this.tokenEncoder.encode(text);
   }
 
   /**

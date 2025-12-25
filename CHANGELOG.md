@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-12-26
+
+### Added
+- **Multilingual token optimization** - Accurate token counting for 15+ languages
+  - Language-aware token multipliers (2x for Chinese, 2.5x for Japanese, 3x for Arabic, etc.)
+  - Support for mixed-language text detection and optimization
+  - Comprehensive language profiles with detection patterns
+- **Comprehensive benchmarking system**
+  - Real statistical data from benchmark tests (12 test cases)
+  - Multiple data types: small/medium/large JSON, CSV-like, nested structures, API responses
+  - Multilingual test cases (English, Chinese, Japanese)
+- **Multilingual documentation**
+  - README versions in Traditional Chinese (zh-TW), Simplified Chinese (zh-CN), Japanese (ja), Spanish (es), Vietnamese (vi), and Indonesian (id)
+  - Language navigation links in all README versions
+
+### Changed
+- **Updated token savings claims** with data-backed accuracy
+  - From "60%+ on average" to "30-65% depending on data structure"
+  - Typical savings: 50-55% for structured data
+  - Based on real benchmark results (12 test cases, 7 valid results)
+- Improved confidence calculation in language detection
+  - Adaptive weighting based on character density
+  - Better handling of CJK language overlap (Chinese vs Japanese)
+  - Enhanced English detection patterns
+- TypeScript type definitions updated for multilingual support
+
+### Fixed
+- Language detection accuracy for non-English languages
+  - Chinese detection confidence improved from 33.8% to >70%
+  - Japanese detection confidence improved from 64% to >70%
+  - Arabic detection confidence improved from 32.3% to >70%
+- Mixed-language text detection (English + CJK)
+- Tiktoken initialization issues in standalone scripts
+  - Now using Jest test environment for reliable WASM initialization
+
+### Technical Details
+- **New modules**:
+  - `src/optimizer/multilingual/language-detector.ts` - Language detection with confidence scoring
+  - `src/optimizer/multilingual/language-profiles.ts` - 15+ language profiles with token multipliers
+  - `src/optimizer/multilingual/tokenizer-adapter.ts` - Multilingual tokenizer wrapper
+  - `tests/multilingual/language-detector.test.ts` - 47 tests for language detection
+  - `tests/multilingual/tokenizer-adapter.test.ts` - 28 tests for tokenizer adapter
+  - `tests/benchmarks/quick-stats.test.ts` - Benchmark testing with real statistics
+- **Test coverage**: 75+ tests passing, including multilingual edge cases
+- **Language support**: English, Chinese (Simplified & Traditional), Japanese, Korean, Spanish, French, German, Arabic, Russian, Portuguese, Thai, Tamil, Hindi, Vietnamese, Indonesian
+
 ## [0.2.3] - 2025-12-25
 
 ### Fixed

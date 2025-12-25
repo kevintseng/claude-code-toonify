@@ -1,26 +1,28 @@
 # 🎯 Toonify MCP
 
-**[English](README.md) | [繁體中文](README.zh-TW.md)**
+**[English](README.md) | [繁體中文](README.zh-TW.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [Español](README.es.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md)**
 
-MCP 伺服器 + Claude Code 插件，提供結構化數據的自動 token 優化。
-透過透明的 TOON 格式轉換，**平均減少 60%+ 的 Claude API token 使用**。
+MCP 伺服器 + Claude Code 外掛程式，提供結構化數據的自動 token 優化。
+透過透明的 TOON 格式轉換，**根據數據結構減少 30-65% 的 Claude API token 使用量**，結構化數據的典型節省率為 **50-55%**。
 
-## v0.2.0 新功能
+## v0.3.0 新功能
 
-✨ **現在是完整的 Claude Code 插件！**
-- ✅ 自動 PostToolUse hook 攔截
-- ✅ 無需手動調用
-- ✅ 透明優化
-- ✅ 仍可作為獨立 MCP 伺服器使用
+✨ **多語言 Token 優化！**
+- ✅ 精確計算 15+ 種語言的 token（中文、日文、韓文、西班牙文、阿拉伯文等）
+- ✅ 語言感知的 token 倍數（中文 2 倍、日文 2.5 倍、阿拉伯文 3 倍）
+- ✅ 支援混合語言文本的自動偵測
+- ✅ 基於真實基準測試改進優化準確性
+- ✅ 數據支持的 token 節省聲明（30-65% 範圍，通常 50-55%）
 
 ## 功能特色
 
-- **60%+ Token 減少** - 針對 JSON、CSV、YAML 數據
-- **完全自動** - PostToolUse hook 自動攔截工具結果
-- **零配置** - 開箱即用，預設值合理
-- **雙模式** - 插件模式（自動）+ MCP 伺服器模式（手動）
-- **內建指標** - 本地追蹤 token 節省
-- **靜默降級** - 永不中斷工作流程
+- **30-65% Token 減少**（通常 50-55%）適用於 JSON、CSV、YAML 數據
+- **多語言支援** - 精確計算 15+ 種語言的 token
+- **完全自動** - PostToolUse hook 攔截工具結果
+- **零配置** - 開箱即用，採用合理預設值
+- **雙模式** - 作為外掛程式（自動）或 MCP 伺服器（手動）
+- **內建指標** - 在本地追蹤 token 節省
+- **靜默回退** - 永不中斷您的工作流程
 
 ## 安裝方式
 
@@ -79,7 +81,7 @@ Hook 偵測 JSON，轉換為 TOON
   ↓
 優化後的內容發送到 Claude API
   ↓
-實現 60% token 減少 ✨
+達成 50-55% 典型 token 減少 ✨
 ```
 
 ### MCP 伺服器模式（手動）
@@ -240,6 +242,15 @@ npm uninstall -g toonify-mcp
 MIT License - 請參閱 [LICENSE](LICENSE)
 
 ## 更新日誌
+
+### v0.3.0（2025-12-26）
+- ✨ **多語言 token 優化** - 精確計算 15+ 種語言
+- ✨ 語言感知的 token 倍數（中文 2 倍、日文 2.5 倍、阿拉伯文 3 倍等）
+- ✨ 混合語言文本偵測和優化
+- ✨ 使用真實統計數據進行全面基準測試
+- 📊 數據支持的 token 節省聲明（30-65% 範圍，通常 50-55%）
+- ✅ 75+ 測試通過，包括多語言邊緣情況
+- 📝 多語言 README 版本
 
 ### v0.2.0 (2025-12-25)
 - ✨ 新增 Claude Code 插件支援與 PostToolUse hook

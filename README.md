@@ -1,21 +1,23 @@
 # 🎯 Toonify MCP
 
-**[English](README.md) | [繁體中文](README.zh-TW.md)**
+**[English](README.md) | [繁體中文](README.zh-TW.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [Español](README.es.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md)**
 
 MCP server + Claude Code Plugin providing automatic token optimization for structured data.
-Reduces Claude API token usage by **60%+ on average** through transparent TOON format conversion.
+Reduces Claude API token usage by **30-65% depending on data structure** through transparent TOON format conversion, with typical savings of **50-55%** for structured data.
 
-## What's New in v0.2.0
+## What's New in v0.3.0
 
-✨ **Now a full Claude Code Plugin!**
-- ✅ Automatic PostToolUse hook interception
-- ✅ Zero manual calls needed
-- ✅ Transparent optimization
-- ✅ Still works as standalone MCP server
+✨ **Multilingual Token Optimization!**
+- ✅ Accurate token counting for 15+ languages (Chinese, Japanese, Korean, Spanish, Arabic, etc.)
+- ✅ Language-aware token multipliers (2x for Chinese, 2.5x for Japanese, 3x for Arabic)
+- ✅ Mixed-language text support with automatic detection
+- ✅ Improved optimization accuracy based on real benchmarks
+- ✅ Data-backed token savings claims (30-65% range, typically 50-55%)
 
 ## Features
 
-- **60%+ Token Reduction** for JSON, CSV, YAML data
+- **30-65% Token Reduction** (typically 50-55%) for JSON, CSV, YAML data
+- **Multilingual Support** - Accurate token counting for 15+ languages
 - **Fully Automatic** - PostToolUse hook intercepts tool results
 - **Zero Configuration** - Works out of the box with sensible defaults
 - **Dual Mode** - Works as Plugin (auto) or MCP Server (manual)
@@ -79,7 +81,7 @@ Hook detects JSON, converts to TOON
   ↓
 Optimized content sent to Claude API
   ↓
-60% token reduction achieved ✨
+50-55% typical token reduction achieved ✨
 ```
 
 ### MCP Server Mode (Manual)
@@ -240,6 +242,15 @@ Contributions welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guideli
 MIT License - see [LICENSE](LICENSE)
 
 ## Changelog
+
+### v0.3.0 (2025-12-26)
+- ✨ **Multilingual token optimization** - accurate counting for 15+ languages
+- ✨ Language-aware token multipliers (2x Chinese, 2.5x Japanese, 3x Arabic, etc.)
+- ✨ Mixed-language text detection and optimization
+- ✨ Comprehensive benchmark testing with real statistics
+- 📊 Data-backed token savings claims (30-65% range, typically 50-55%)
+- ✅ 75+ tests passing, including multilingual edge cases
+- 📝 Multilingual README versions
 
 ### v0.2.0 (2025-12-25)
 - ✨ Added Claude Code Plugin support with PostToolUse hook

@@ -43,6 +43,10 @@ export interface OptimizationConfig {
   skipToolPatterns?: string[]; // Tool names to skip
   // v0.3.0: Enhanced configuration
   caching?: CacheConfig;
+  multilingual?: {
+    enabled: boolean;
+    defaultLanguage: string;
+  };
 }
 
 export interface TokenStats {

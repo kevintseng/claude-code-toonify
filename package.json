@@ -1,6 +1,6 @@
 {
   "name": "@ktseng/claude-code-toonify",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "MCP server + Claude Code Plugin for TOON format token optimization. Automatic 60%+ token reduction on JSON/CSV/YAML data via PostToolUse hook interception.",
   "type": "module",
   "main": "dist/index.js",
